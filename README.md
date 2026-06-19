@@ -24,7 +24,9 @@ The core loop mirrors the original mod:
    pocket dimension if it doesn't already exist. Activated keys shimmer.
 4. **Right-click a placed Suitcase with the activated Keystone** to *link* them. The suitcase lid opens.
 5. **Right-click the linked Suitcase** (empty hand) to **enter**.
-6. Inside, there's a small grass island with a tree and a glowing **Exit Portal**. Right-click the
+6. Inside, there's a lush floating island — gentle hills, scattered oak and birch, boulders and
+   wildflowers — with a glowing **Exit Portal** at its centre and a small furnished **cabin**
+   (bed, chest, crafting table) off to one side. Right-click the
    portal (or stand in it) to leave. You return to the suitcase you came from.
 
 ### Extra mechanics

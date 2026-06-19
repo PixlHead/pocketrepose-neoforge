@@ -19,6 +19,8 @@
 
   "tooltip.pocketrepose.bound": "Bound to: %s",
   "tooltip.pocketrepose.unbound": "Rename in an anvil, then right-click to activate",
+  "tooltip.pocketrepose.linked": "Linked to: %s",
+  "tooltip.pocketrepose.unlinked": "Not linked — use an activated Keystone",
   "tooltip.pocketrepose.holding": "Carrying: %s",
   "tooltip.pocketrepose.holding_unknown": "Carrying a creature",
 

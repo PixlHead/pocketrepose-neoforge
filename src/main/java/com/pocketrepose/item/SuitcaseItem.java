@@ -111,12 +111,24 @@ public class SuitcaseItem extends BlockItem {
 
     @Override
     public boolean isFoil(ItemStack stack) {
-        return stack.has(ModDataComponents.CAPTURED_ENTITY.get()) || super.isFoil(stack);
+        return stack.has(ModDataComponents.CAPTURED_ENTITY.get())
+                || isLinked(stack)
+                || super.isFoil(stack);
     }
 
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context,
                                 List<Component> tooltip, TooltipFlag flag) {
+        // Show which pocket dimension this suitcase points to (matches the Keystone's "Bound to:" line).
+        String linked = stack.get(ModDataComponents.LINKED_DIMENSION.get());
+        if (linked != null && !linked.isEmpty()) {
+            tooltip.add(Component.translatable("tooltip.pocketrepose.linked", linked)
+                    .withStyle(ChatFormatting.LIGHT_PURPLE));
+        } else {
+            tooltip.add(Component.translatable("tooltip.pocketrepose.unlinked")
+                    .withStyle(ChatFormatting.DARK_GRAY));
+        }
+
         CompoundTag tag = stack.get(ModDataComponents.CAPTURED_ENTITY.get());
         if (tag != null) {
             EntityType.by(tag).ifPresentOrElse(
@@ -126,5 +138,10 @@ public class SuitcaseItem extends BlockItem {
                             .withStyle(ChatFormatting.AQUA)));
         }
         super.appendHoverText(stack, context, tooltip, flag);
+    }
+
+    private static boolean isLinked(ItemStack stack) {
+        String linked = stack.get(ModDataComponents.LINKED_DIMENSION.get());
+        return linked != null && !linked.isEmpty();
     }
 }

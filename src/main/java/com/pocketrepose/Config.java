@@ -27,8 +27,9 @@ public final class Config {
                 .define("allowRecursion", true);
 
         GENERATE_SPAWN_ISLAND = builder
-                .comment("If true, newly created pocket dimensions get a small decorative grass island",
-                        "with a tree. A minimal safe standing platform is always generated regardless.")
+                .comment("If true, newly created pocket dimensions get a larger natural island with",
+                        "hills, trees, boulders and ground cover. A minimal safe standing platform is",
+                        "always generated regardless.")
                 .define("generateSpawnIsland", true);
 
         ENTRY_HEIGHT = builder
