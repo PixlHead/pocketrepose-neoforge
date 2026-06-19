@@ -1,0 +1,28 @@
+{
+  "itemGroup.pocketrepose": "Pocket Repose",
+
+  "block.pocketrepose.suitcase": "Traveler's Suitcase",
+  "block.pocketrepose.exit_portal": "Exit Portal",
+
+  "item.pocketrepose.keystone": "Keystone",
+
+  "message.pocketrepose.need_key": "This suitcase needs an activated Keystone. Rename a Keystone in an anvil, then right-click it to activate.",
+  "message.pocketrepose.linked": "Suitcase linked to pocket: %s",
+  "message.pocketrepose.not_linked": "This suitcase isn't linked yet. Link it with an activated Keystone first.",
+  "message.pocketrepose.recursion_disabled": "You can't open a suitcase from inside a pocket dimension.",
+  "message.pocketrepose.key_needs_name": "Rename this Keystone in an anvil before activating it.",
+  "message.pocketrepose.key_activated": "Keystone activated: %s",
+  "message.pocketrepose.entry_set": "Entry point set for this pocket dimension.",
+  "message.pocketrepose.suitcase_full": "This suitcase is already carrying a creature.",
+  "message.pocketrepose.captured": "Captured %s.",
+  "message.pocketrepose.released": "Released %s.",
+
+  "tooltip.pocketrepose.bound": "Bound to: %s",
+  "tooltip.pocketrepose.unbound": "Rename in an anvil, then right-click to activate",
+  "tooltip.pocketrepose.holding": "Carrying: %s",
+  "tooltip.pocketrepose.holding_unknown": "Carrying a creature",
+
+  "command.pocketrepose.allow_recursion": "Pocket Repose: allowRecursion set to %s",
+  "command.pocketrepose.spawn_island": "Pocket Repose: spawnIsland set to %s",
+  "command.pocketrepose.reset_entry": "Pocket Repose: entry point reset for dimension '%s'"
+}

@@ -1,0 +1,40 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "MIT"
+issueTrackerURL = "https://github.com/your-name/PocketRepose/issues"
+
+[[mods]]
+modId = "pocketrepose"
+version = "${mod_version}"
+displayName = "Pocket Repose"
+authors = "Clone author"
+description = '''
+A NeoForge clone of Pocket Repose. Craft a Traveler's Suitcase and a Keystone, name the Keystone in
+an anvil, activate it, and link it to a suitcase to create and travel to your own private (or shared)
+pocket dimension. Built for Minecraft 1.21.1 with All The Mods 10 in mind.
+'''
+logoFile = ""
+
+# Runtime dynamic-dimension backend. Pocket Repose uses Commoble's Infiniverse to register pocket
+# dimensions at runtime. All The Mods 10 may already bundle Infiniverse; if so this dependency is
+# satisfied automatically. If not, install Infiniverse for NeoForge 1.21.1.
+[[dependencies.pocketrepose]]
+modId = "infiniverse"
+type = "required"
+versionRange = "[2.0,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.pocketrepose]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.1,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.pocketrepose]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1,1.22)"
+ordering = "NONE"
+side = "BOTH"

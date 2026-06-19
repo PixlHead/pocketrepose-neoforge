@@ -1,0 +1,23 @@
+# Gradle / build
+.gradle/
+build/
+out/
+*.class
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.eclipse/
+.settings/
+.classpath
+.project
+bin/
+
+# NeoForge dev runs
+run/
+runs/
+run-data/
+logs/

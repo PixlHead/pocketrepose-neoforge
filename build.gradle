@@ -1,0 +1,96 @@
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'idea'
+    // ModDevGradle. Latest version: https://projects.neoforged.net/neoforged/ModDevGradle
+    id 'net.neoforged.moddev' version '2.0.141'
+}
+
+version = "${mod_version}"
+group = "${mod_group_id}"
+
+base {
+    archivesName = "${mod_id}-neoforge-${minecraft_version}"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    withSourcesJar()
+}
+
+repositories {
+    mavenLocal()
+    // CurseMaven — used to pull the MC 1.21.1 build of Infiniverse straight from CurseForge.
+    // (Commoble's own maven only hosts Infiniverse for 1.21.9+, so 1.21.1 isn't available there.)
+    maven {
+        name = 'CurseMaven'
+        url = 'https://cursemaven.com'
+        content { includeGroup 'curse.maven' }
+    }
+    // Commoble maven — kept for convenience if you later target 1.21.9+ (artifacts: 21.9.0, 21.11.x, ...).
+    maven {
+        name = 'Commoble Maven'
+        url = 'https://maven.commoble.net/'
+    }
+}
+
+neoForge {
+    // The NeoForge version to compile and run against (pulled from gradle.properties).
+    version = "${neo_version}"
+
+    // Uses Mojang's official mappings by default. Parchment mappings are optional and intentionally
+    // omitted here to keep the build self-contained; add a `parchment { ... }` block if you want them.
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+        }
+    }
+
+    mods {
+        pocketrepose {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+dependencies {
+    // Runtime dynamic-dimension backend (Commoble Infiniverse), MC 1.21.1 / NeoForge build, pulled
+    // from CurseForge via CurseMaven. Coordinate format is curse.maven:<slug>-<projectId>:<fileId>.
+    //   project 568341 = Infiniverse, file 5486311 = infiniverse-1.21-2.0.1.0.jar (MC 1.21.1, NeoForge)
+    // Already in Mojang mappings, so ModDevGradle consumes it directly (no deobf step needed). It is
+    // compiled against here and loaded as a mod in dev runs; in production it must be installed
+    // alongside this mod (see the README) — All The Mods 10 may already include it.
+    implementation "curse.maven:infiniverse-${infiniverse_project_id}:${infiniverse_file_id}"
+}
+
+// Expand ${mod_version} (and friends) inside neoforge.mods.toml at build time.
+tasks.named('processResources', ProcessResources).configure {
+    def replaceProperties = [
+            mod_version  : project.mod_version,
+            mod_id       : project.mod_id,
+            mod_name     : project.mod_name,
+            mod_authors  : project.mod_authors,
+            mod_description: project.mod_description
+    ]
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/neoforge.mods.toml']) {
+        expand replaceProperties
+    }
+}
+
+tasks.named('jar', Jar).configure {
+    manifest {
+        attributes([
+                'Specification-Title'   : project.mod_id,
+                'Specification-Vendor'  : project.mod_authors,
+                'Specification-Version' : '1',
+                'Implementation-Title'  : project.mod_name,
+                'Implementation-Version': project.mod_version,
+                'Implementation-Vendor' : project.mod_authors
+        ])
+    }
+}
