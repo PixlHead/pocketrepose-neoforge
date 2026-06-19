@@ -1,6 +1,5 @@
 package com.pocketrepose.world;
 
-import com.pocketrepose.registry.ModBlocks;
 import com.pocketrepose.registry.ModDimensions;
 import net.commoble.infiniverse.api.InfiniverseAPI;
 import net.minecraft.core.BlockPos;
@@ -121,10 +120,11 @@ public final class PocketDimensionManager {
     }
 
     /**
-     * Build the spawn island. A safe standing platform and an exit portal are always placed; when
-     * {@code decorative} is true a larger, irregularly shaped floating island is grown instead, with
-     * gentle hills, scattered trees, boulders and ground cover. The area around the exit portal and
-     * the default entry point is always kept flat and clear so players land safely.
+     * Build the spawn island. When {@code decorative} is true a larger, irregularly shaped floating
+     * island is grown, with gentle hills, scattered trees, boulders and ground cover; otherwise a
+     * small, safe standing platform is placed. The area around the default entry point is always kept
+     * flat and clear so players land safely. Players leave by walking off the edge and dropping into
+     * the void, which sends them home (see {@link com.pocketrepose.util.TeleportHelper#tickVoidExit}).
      */
     public static void generateSpawnPlatform(ServerLevel level, boolean decorative) {
         BlockPos entry = PocketReposeState.defaultEntry();
@@ -138,11 +138,6 @@ public final class PocketDimensionManager {
         } else {
             generateMinimalPlatform(level, groundY);
         }
-
-        // Exit portal at the centre; the entry point is offset (see defaultEntry) so the player
-        // doesn't immediately walk back into it.
-        level.setBlock(new BlockPos(0, groundY + 1, 0),
-                ModBlocks.EXIT_PORTAL.get().defaultBlockState(), Block.UPDATE_ALL);
     }
 
     /** A small, flat, always-safe disk for when decorative islands are disabled. */
@@ -170,7 +165,7 @@ public final class PocketDimensionManager {
     private static void generateNaturalIsland(ServerLevel level, int groundY, RandomSource random) {
         final double tau = Math.PI * 2.0;
         final int baseRadius = 24;    // rough island radius
-        final int coreRadius = 5;     // flat, decoration-free clearing around the portal/entry
+        final int coreRadius = 5;     // flat, decoration-free clearing around the spawn/entry point
         final int maxThickness = 12;  // dirt + stone depth at the centre
         final int scan = baseRadius + 6;
 

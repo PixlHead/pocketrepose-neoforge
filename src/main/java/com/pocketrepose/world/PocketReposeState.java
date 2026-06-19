@@ -46,7 +46,7 @@ public class PocketReposeState extends SavedData {
         this.generateSpawnIsland = Config.GENERATE_SPAWN_ISLAND.get();
     }
 
-    /** The default entry point for a freshly created pocket dimension (offset from the exit portal). */
+    /** The default entry point for a freshly created pocket dimension (offset from the island centre). */
     public static BlockPos defaultEntry() {
         return new BlockPos(0, Config.ENTRY_HEIGHT.get(), 3);
     }

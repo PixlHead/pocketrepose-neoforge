@@ -21,6 +21,12 @@ public final class TeleportHelper {
     private static final int TELEPORT_COOLDOWN_TICKS = 40;
     /** How far from the recorded return position we search for the linked suitcase. */
     private static final int SUITCASE_SEARCH_RADIUS = 6;
+    /**
+     * A player who falls this many blocks below the pocket dimension's floor is treated as having
+     * jumped into the void and is sent home. Kept well above the depth where vanilla deals
+     * out-of-world damage (floor - 64), so the player is caught long before anything can hurt them.
+     */
+    private static final int VOID_EXIT_DROP = 8;
 
     private static final Map<UUID, Long> lastTeleportTime = new HashMap<>();
 
@@ -78,6 +84,7 @@ public final class TeleportHelper {
             setCooldown(player);
             player.teleportTo(overworld, spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5,
                     player.getYRot(), player.getXRot());
+            player.resetFallDistance();
             state.clearReturnPoint(player.getUUID());
             return;
         }
@@ -91,7 +98,23 @@ public final class TeleportHelper {
         setCooldown(player);
         player.teleportTo(targetLevel, dest.getX() + 0.5, dest.getY(), dest.getZ() + 0.5,
                 player.getYRot(), player.getXRot());
+        player.resetFallDistance();
         state.clearReturnPoint(player.getUUID());
+    }
+
+    /**
+     * Called every server tick for each player. If the player has jumped off their pocket
+     * dimension's island and fallen into the void below, send them back out to the suitcase they
+     * entered from. They are caught well above the depth where the void would damage them, so the
+     * trip home is harmless.
+     */
+    public static void tickVoidExit(ServerPlayer player) {
+        if (!PocketDimensionManager.isPocketDimension(player.level().dimension())) {
+            return;
+        }
+        if (player.getY() < player.level().getMinBuildHeight() - VOID_EXIT_DROP) {
+            exit(player);
+        }
     }
 
     private static BlockPos findLinkedSuitcase(ServerLevel level, BlockPos center, String dimName, int radius) {

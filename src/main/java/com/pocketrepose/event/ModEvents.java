@@ -3,12 +3,15 @@ package com.pocketrepose.event;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.pocketrepose.PocketRepose;
+import com.pocketrepose.util.TeleportHelper;
 import com.pocketrepose.world.PocketDimensionManager;
 import com.pocketrepose.world.PocketReposeState;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -18,8 +21,10 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 /**
  * Game-bus event handlers: command registration, dimension re-registration on startup, mob-spawn
@@ -29,6 +34,24 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
 public final class ModEvents {
 
     private ModEvents() {}
+
+    /** Send a player who has jumped into the void below a pocket dimension back to the suitcase. */
+    @SubscribeEvent
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            TeleportHelper.tickVoidExit(player);
+        }
+    }
+
+    /** Never let the void hurt a player inside a pocket dimension — they fall through it to leave. */
+    @SubscribeEvent
+    public static void onVoidDamage(LivingIncomingDamageEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player
+                && event.getSource().is(DamageTypes.FELL_OUT_OF_WORLD)
+                && PocketDimensionManager.isPocketDimension(player.level().dimension())) {
+            event.setCanceled(true);
+        }
+    }
 
     /** Re-create every known pocket dimension so players who log out inside one return correctly. */
     @SubscribeEvent
