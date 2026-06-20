@@ -16,6 +16,7 @@
   "message.pocketrepose.suitcase_full": "This suitcase is already carrying a creature.",
   "message.pocketrepose.captured": "Captured %s.",
   "message.pocketrepose.released": "Released %s.",
+  "message.pocketrepose.vehicle_unreachable": "Your suitcase is on a vehicle that isn't loaded — returning you to spawn.",
 
   "tooltip.pocketrepose.bound": "Bound to: %s",
   "tooltip.pocketrepose.unbound": "Rename in an anvil, then right-click to activate",

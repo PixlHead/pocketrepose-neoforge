@@ -24,10 +24,11 @@ The core loop mirrors the original mod:
    pocket dimension if it doesn't already exist. Activated keys shimmer.
 4. **Right-click a placed Suitcase with the activated Keystone** to *link* them. The suitcase lid opens.
 5. **Right-click the linked Suitcase** (empty hand) to **enter**.
-6. Inside, there's a lush floating island — gentle hills, scattered oak and birch, boulders and
-   wildflowers — with a glowing **Exit Portal** at its centre and a small furnished **cabin**
-   (bed, chest, crafting table) off to one side. Right-click the
-   portal (or stand in it) to leave. You return to the suitcase you came from.
+6. Inside, you arrive on a **prebuilt floating island** — the same one the original *Pocket Repose*
+   ships — with a furnished cabin, a little farm and workshop, gardens and decorations. A glowing
+   **Exit Portal** sits just up the ladder from where you land. Right-click the portal (or stand in
+   it) to leave — or simply step off the island into the void. Either way you return to the suitcase
+   you came from.
 
 ### Extra mechanics
 
@@ -48,7 +49,8 @@ All require permission level 2 (op):
 - `/pocketrepose allowRecursion <true|false>` — allow/deny opening a suitcase *from inside* a pocket
   dimension (nesting). Default: allowed.
 - `/pocketrepose spawnIsland <true|false>` — whether *newly created* pocket dimensions get the
-  decorative island (a safety platform + exit portal are always placed regardless).
+  prebuilt island (with its cabin and exit portal). When off, a minimal grass platform is placed
+  instead; step off it into the void to leave. Default: on.
 - `/pocketrepose resetplayerentry <dimensionName>` — reset a dimension's entry point to the default.
 
 ### Recipes

@@ -1,6 +1,7 @@
 package com.pocketrepose.util;
 
 import com.pocketrepose.block.SuitcaseBlockEntity;
+import com.pocketrepose.compat.SableCompat;
 import com.pocketrepose.world.PocketDimensionManager;
 import com.pocketrepose.world.PocketReposeState;
 import net.minecraft.core.BlockPos;
@@ -10,6 +11,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +29,13 @@ public final class TeleportHelper {
      * out-of-world damage (floor - 64), so the player is caught long before anything can hurt them.
      */
     private static final int VOID_EXIT_DROP = 8;
+    /**
+     * Refuse to force-load a return position farther than this from the origin on X or Z. Such
+     * coordinates belong to physics-object "sublevel" space (e.g. Create Aeronautics / Sable);
+     * pulling those chunks in via vanilla crashes the physics engine. {@link SableCompat} resolves
+     * physics suitcases properly — this is only a backstop for when it can't.
+     */
+    private static final int SAFE_RETURN_COORD = 1_000_000;
 
     private static final Map<UUID, Long> lastTeleportTime = new HashMap<>();
 
@@ -77,14 +86,38 @@ public final class TeleportHelper {
         ServerLevel targetLevel = ret != null ? server.getLevel(ret.dimension()) : null;
 
         if (ret == null || targetLevel == null) {
-            // Fallback: overworld spawn.
-            ServerLevel overworld = server.overworld();
-            BlockPos spawn = overworld.getSharedSpawnPos();
-            overworld.getChunk(spawn.getX() >> 4, spawn.getZ() >> 4);
-            setCooldown(player);
-            player.teleportTo(overworld, spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5,
-                    player.getYRot(), player.getXRot());
-            player.resetFallDistance();
+            returnToOverworldSpawn(player, server);
+            state.clearReturnPoint(player.getUUID());
+            return;
+        }
+
+        // If the suitcase is attached to a Create Aeronautics / Sable physics object, its recorded
+        // position lives in the object's internal "sublevel" space (millions of blocks out). Force-
+        // loading or teleporting there crashes the physics engine, so ask Sable for the object's
+        // current real-world position and drop the player on top of it instead.
+        if (SableCompat.isPhysicsObjectPos(targetLevel, ret.pos())) {
+            Vec3 onVehicle = SableCompat.physicsObjectReturnPos(targetLevel, ret.pos());
+            if (onVehicle != null) {
+                setCooldown(player);
+                player.teleportTo(targetLevel, onVehicle.x, onVehicle.y, onVehicle.z,
+                        player.getYRot(), player.getXRot());
+                player.resetFallDistance();
+            } else {
+                // The vehicle isn't loaded, so we can't place them on it; send them somewhere safe.
+                player.displayClientMessage(
+                        Component.translatable("message.pocketrepose.vehicle_unreachable"), true);
+                returnToOverworldSpawn(player, server);
+            }
+            state.clearReturnPoint(player.getUUID());
+            return;
+        }
+
+        // Backstop: a normal suitcase should never be recorded this far out. If one is, it is almost
+        // certainly an unrecognised physics-object position, so don't risk force-loading it.
+        if (Math.abs(ret.pos().getX()) > SAFE_RETURN_COORD || Math.abs(ret.pos().getZ()) > SAFE_RETURN_COORD) {
+            player.displayClientMessage(
+                    Component.translatable("message.pocketrepose.vehicle_unreachable"), true);
+            returnToOverworldSpawn(player, server);
             state.clearReturnPoint(player.getUUID());
             return;
         }
@@ -100,6 +133,17 @@ public final class TeleportHelper {
                 player.getYRot(), player.getXRot());
         player.resetFallDistance();
         state.clearReturnPoint(player.getUUID());
+    }
+
+    /** Send the player to the overworld spawn — the last-resort safe destination. */
+    private static void returnToOverworldSpawn(ServerPlayer player, MinecraftServer server) {
+        ServerLevel overworld = server.overworld();
+        BlockPos spawn = overworld.getSharedSpawnPos();
+        overworld.getChunk(spawn.getX() >> 4, spawn.getZ() >> 4);
+        setCooldown(player);
+        player.teleportTo(overworld, spawn.getX() + 0.5, spawn.getY(), spawn.getZ() + 0.5,
+                player.getYRot(), player.getXRot());
+        player.resetFallDistance();
     }
 
     /**
